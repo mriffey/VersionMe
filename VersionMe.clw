@@ -25,7 +25,7 @@ EQ:ConfigVersionTypePRJ            EQUATE('PRJ')
 EQ:ConfigVersionTypeSLN            EQUATE('SLN')
   
 strBinaryType       STRING(10)  
-strBinaryName       STRING(50)
+strBinaryName       STRING(100)
 strPublicDocuments  STRING(512) 
 strAppFolder        STRING(512) 
 strRev              STRING(5) 
@@ -132,6 +132,7 @@ SetupAndGetParameters  ROUTINE
  
  CASE LOWER(CLIP(strBinaryType))
     OF 'winexe'
+    OROF 'exe'
        strDLLorEXE = 'VFT_APP'
        strBinaryFullName = CLIP(strBinaryName) & '.EXE'
     OF 'library'
