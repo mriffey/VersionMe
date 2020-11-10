@@ -110,7 +110,7 @@ oST                     StringTheory
 !  oXML.Trace('gConfig.SBINIFILE=' & gConfig.SBIniFile)
   
   oXML.Save(gConfig,CLIP(strAppFolder) & '\' & CLIP(strBinaryName) & '_VersionMe.xml','VersionMeConfig','')
-  oXML.Trace('at end records(qconfig)=' & RECORDS(qConfig))
+  !oXML.Trace('at end records(qconfig)=' & RECORDS(qConfig))
   
 !  IF RECORDS(qConfig) > 0
 !     oXML.Append = TRUE 
@@ -141,10 +141,14 @@ SetupAndGetParameters  ROUTINE
  END 
  
  ! get versioning config
- IF EXISTS(CLIP(strAppFolder) & '\' & CLIP(strBinaryName) & '_VersionMe.xml') = TRUE 
+ IF EXISTS(CLIP(strAppFolder) & CLIP(strBinaryName) & '_VersionMe.xml') = TRUE 
     oXML.TagCase = XF:CaseAny
-    oXML.LoggingOn = TRUE 
-    oXML.Load(gConfig,CLIP(strAppFolder) & '\' & CLIP(strBinaryName) & '_VersionMe.xml','VersionMeConfig','')   
+    IF COMMAND('/Debug') 
+       oXML.LoggingOn = TRUE
+    ELSE
+       oXML.LoggingOn = FALSE  
+    END 
+    oXML.Load(gConfig,CLIP(strAppFolder) & CLIP(strBinaryName) & '_VersionMe.xml','VersionMeConfig','')   
     
 !    oXML.Trace('After Load ================')
 !    oXML.Trace('gConfig.BuildNumber=' & gConfig.BuildNumber)
@@ -166,7 +170,7 @@ SetupAndGetParameters  ROUTINE
        PUT(qConfig)
     END
  ELSE
-    MESSAGE('Config file needed. Filename for ' & CLIP(strBinaryName) & '.cwproj should be "' & CLIP(strAppFolder) & '\' & CLIP(strBinaryName) & '_VersionMe.xml".')
+    MESSAGE('Config file needed. Filename for ' & CLIP(strBinaryName) & '.cwproj should be "' & CLIP(strAppFolder) & CLIP(strBinaryName) & '_VersionMe.xml".')
  END 
  
  EXIT 
@@ -281,21 +285,100 @@ SetVersionBySolution ROUTINE
 SetVersionByProject ROUTINE 
 !-------------------------------------        
 
- IF CLIP(gConfig.FileVersionNumberRev) > ' '       
-    strRev = qConfig.FileVersionNumberRev   
- ELSE
-    strRev = qConfig.BuildNumber  ! we use strRev because we dont want this value stored
+ CASE CLIP(gConfig.FileVersionNumberMaj)
+    ! supports YYYY.MM.DD.data
+    OF 'YYYY'
+       IF CLIP(gConfig.FileVersionNumberRev) > ' '       
+          strRev = gConfig.FileVersionNumberRev   
+       ELSE
+          strRev = gConfig.BuildNumber  ! we use strRev because we dont want this value stored
+       END 
+       strFileVersion     = YEAR(TODAY()) & ',' & MONTH(TODAY()) & ',' & DAY(TODAY()) & ',' & CLIP(strRev)          
+       strFileVersionDOTS = YEAR(TODAY()) & '.' & MONTH(TODAY()) & '.' & DAY(TODAY()) & '.' & CLIP(strRev)          
+    
+    ! supports YY.MM.DD.data
+    OF 'YY'
+       IF CLIP(gConfig.FileVersionNumberRev) > ' '       
+          strRev = gConfig.FileVersionNumberRev
+       ELSE
+          strRev = gConfig.BuildNumber
+       END 
+       strFileVersion     = FORMAT(YEAR(TODAY()) - 2000,@N_2) & ',' & MONTH(TODAY()) & ',' & DAY(TODAY()) & ',' & CLIP(strRev)          
+       strFileVersionDOTS = FORMAT(YEAR(TODAY()) - 2000,@N_2) & '.' & MONTH(TODAY()) & '.' & DAY(TODAY()) & '.' & CLIP(strRev)          
+       
+    ELSE       
+       IF CLIP(gConfig.FileVersionNumberMin) = 'YYYY' 
+          ! supports data.YYYY.MM.DD
+          strFileVersion     = CLIP(gConfig.FileVersionNumberMaj) & ',' & YEAR(TODAY()) & ',' & MONTH(TODAY()) & ',' & DAY(TODAY()) 
+          strFileVersionDOTS = CLIP(gConfig.FileVersionNumberMaj) & '.' & YEAR(TODAY()) & '.' & MONTH(TODAY()) & '.' & DAY(TODAY()) 
+       ELSE
+          ! supports data.YY.MM.DD
+          IF CLIP(gConfig.FileVersionNumberMin) = 'YY' 
+             strFileVersion     = CLIP(gConfig.FileVersionNumberMaj) & ',' & FORMAT(YEAR(TODAY()) - 2000,@N_2) & ',' & MONTH(TODAY()) & ',' & DAY(TODAY())           
+             strFileVersionDOTS = CLIP(gConfig.FileVersionNumberMaj) & '.' & FORMAT(YEAR(TODAY()) - 2000,@N_2) & '.' & MONTH(TODAY()) & '.' & DAY(TODAY())           
+          ELSE 
+             ! supports data.data.data.data.
+             strFileVersion = CLIP(gConfig.FileVersionNumberMaj) & ',' & CLIP(gConfig.FileVersionNumberMin) & ',' & CLIP(gConfig.FileVersionNumberSub) & ',' & CLIP(gConfig.FileVersionNumberRev)
+             strFileVersion = CLIP(gConfig.FileVersionNumberMaj) & '.' & CLIP(gConfig.FileVersionNumberMin) & '.' & CLIP(gConfig.FileVersionNumberSub) & '.' & CLIP(gConfig.FileVersionNumberRev)
+          END 
+       END 
  END 
-
- strFileVersion     = CLIP(qConfig.FileVersionNumberMaj) & ',' & CLIP(qConfig.FileVersionNumberMin) & ',' & CLIP(qConfig.FileVersionNumberSub) & ',' & CLIP(strRev)
- strFileVersionDOTS = CLIP(qConfig.FileVersionNumberMaj) & '.' & CLIP(qConfig.FileVersionNumberMin) & '.' & CLIP(qConfig.FileVersionNumberSub) & '.' & CLIP(strRev)
  
- IF CLIP(qConfig.ProductVersionNumberMaj) > ' '
-    strProductVersion     = CLIP(qConfig.ProductVersionNumberMaj) & ',' & CLIP(qConfig.ProductVersionNumberMin) & ',' & CLIP(qConfig.ProductVersionNumberSub) & ',' & CLIP(strRev)
-    strProductVersionDOTS = CLIP(qConfig.ProductVersionNumberMaj) & '.' & CLIP(qConfig.ProductVersionNumberMin) & '.' & CLIP(qConfig.ProductVersionNumberSub) & '.' & CLIP(strRev)
- ELSE 
-    strProductVersion = strFileVersion
+! IF CLIP(gConfig.ProductVersionNumberMaj) > ' '
+!    CASE CLIP(gConfig.ProductVersionNumberMaj)
+!       ! supports YYYY.MM.DD.data
+!       OF 'YYYY'
+!          IF CLIP(gConfig.FileVersionNumberRev) > ' '       
+!             strRev = gConfig.FileVersionNumberRev   
+!          ELSE
+!             strRev = gConfig.BuildNumber  ! we use strRev because we dont want this value stored
+!          END 
+!       
+!          strProductVersion     = YEAR(TODAY()) & ',' & MONTH(TODAY()) & ',' & DAY(TODAY()) & ',' & CLIP(strRev)          
+!          strProductVersionDOTS = YEAR(TODAY()) & '.' & MONTH(TODAY()) & '.' & DAY(TODAY()) & '.' & CLIP(strRev)          
+!       
+!       ! supports YY.MM.DD.data
+!       OF 'YY'
+!          IF CLIP(gConfig.FileVersionNumberRev) > ' '       
+!             strRev = gConfig.FileVersionNumberRev   
+!          ELSE
+!             strRev = gConfig.BuildNumber  ! we use strRev because we dont want this value stored
+!          END 
+!          
+!          strProductVersion     = FORMAT(YEAR(TODAY()) - 2000,@N_2) & ',' & MONTH(TODAY()) & ',' & DAY(TODAY()) & ',' & CLIP(strRev)          
+!          strProductVersionDOTS = FORMAT(YEAR(TODAY()) - 2000,@N_2) & '.' & MONTH(TODAY()) & '.' & DAY(TODAY()) & '.' & CLIP(strRev)          
+!          
+!       ELSE
+!          strProductVersion = CLIP(gConfig.ProductVersionNumberMaj)
+!          
+!          IF CLIP(gConfig.ProductVersionNumberMin) = 'YYYY' 
+!             ! supports data.YYYY.MM.DD
+!             strProductVersion     = CLIP(strProductVersion) & ',' & YEAR(TODAY()) & ',' & MONTH(TODAY()) & ',' & DAY(TODAY()) 
+!             strProductVersionDOTS = CLIP(strProductVersion) & '.' & YEAR(TODAY()) & '.' & MONTH(TODAY()) & '.' & DAY(TODAY()) 
+!          ELSE
+!             ! supports data.YY.MM.DD
+!             IF CLIP(gConfig.ProductVersionNumberMin) = 'YY' 
+!                strProductVersion = CLIP(strProductVersion) & ',' & FORMAT(YEAR(TODAY()) - 2000,@N_2) & ',' & MONTH(TODAY()) & ',' & DAY(TODAY())           
+!             ELSE 
+!                ! supports data.data.data.data.
+!                IF CLIP(gConfig.FileVersionNumberRev) > ' '       
+!                   strRev = gConfig.FileVersionNumberRev   
+!                ELSE
+!                   strRev = gConfig.BuildNumber  ! we use strRev because we dont want this value stored
+!                END                 
+!
+!                strProductVersion = CLIP(strProductVersion) & ',' & CLIP(gConfig.ProductVersionNumberMin) & ',' & CLIP(gConfig.ProductVersionNumberSub) & ',' & CLIP(strRev)
+!             END 
+!          END 
+!    END 
+! ELSE 
+ IF CLIP(strProductVersion) > ' '
+ ELSE
+    strProductVersion     = strFileVersion
+    strProductVersionDOTS = strFileVersionDOTS
  END 
+! END  
+
   
  IF CLIP(qConfig.VersionText) > ' '
     strVersionText       = qConfig.VersionText
@@ -369,7 +452,7 @@ BuildVersionFile ROUTINE
  
   CASE gConfig.VersionType
      OF EQ:ConfigVersionTypePRJ
-        oST.SaveFile(CLIP(strAppFolder) & '\' & CLIP(strProjectName) & '.version') 
+        oST.SaveFile(CLIP(strAppFolder) & '\' & CLIP(strBinaryName) & '.version') 
         
      OF EQ:ConfigVersionTypeSLN
         oST.SaveFile(CLIP(strAppFolder) & '\' & CLIP(strBinaryName) & '.version') 
@@ -379,7 +462,7 @@ BuildVersionFile ROUTINE
  !
  !SB ini looks LIKE this:
  ![build]
- !version=major.minor.sub.rev.build example: 2019.5.24.930
+ !version=major.minor.sub.<rev.>build example: 2019.5.24.930
  
  IF CLIP(gConfig.SBIniFile) > ' '
     oST.SetValue('[build]<13,10>version=' & CLIP(strFileVersionDots))
