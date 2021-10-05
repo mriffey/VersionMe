@@ -294,7 +294,7 @@ SetVersionByProject ROUTINE
           strRev = gConfig.BuildNumber  ! we use strRev because we dont want this value stored
        END 
        strFileVersion     = YEAR(TODAY()) & ',' & MONTH(TODAY()) & ',' & DAY(TODAY()) & ',' & CLIP(strRev)          
-       strFileVersionDOTS = YEAR(TODAY()) & '.' & MONTH(TODAY()) & '.' & DAY(TODAY()) & '.' & CLIP(strRev)          
+       strFileVersionDOTS = YEAR(TODAY()) & '.' & MONTH(TODAY()) & '.' & DAY(TODAY()) !& '.' & CLIP(strRev)          
     
     ! supports YY.MM.DD.data
     OF 'YY'
@@ -304,7 +304,7 @@ SetVersionByProject ROUTINE
           strRev = gConfig.BuildNumber
        END 
        strFileVersion     = FORMAT(YEAR(TODAY()) - 2000,@N_2) & ',' & MONTH(TODAY()) & ',' & DAY(TODAY()) & ',' & CLIP(strRev)          
-       strFileVersionDOTS = FORMAT(YEAR(TODAY()) - 2000,@N_2) & '.' & MONTH(TODAY()) & '.' & DAY(TODAY()) & '.' & CLIP(strRev)          
+       strFileVersionDOTS = FORMAT(YEAR(TODAY()) - 2000,@N_2) & '.' & MONTH(TODAY()) & '.' & DAY(TODAY()) !& '.' & CLIP(strRev)          
        
     ELSE       
        IF CLIP(gConfig.FileVersionNumberMin) = 'YYYY' 
@@ -447,7 +447,8 @@ BuildVersionFile ROUTINE
  oST.Replace('$VERSIONTEXT$',CLIP(strVersionText))
  oST.Replace('$YYYYMMDD$',CLIP(FORMAT(TODAY(),@D10-)))
  oST.Replace('$VERSIONTEXTSHORT$',CLIP(strVersionTextShort))
- oST.Replace('$BUILDNUMBER$',CLIP(intBuildNumber))
+ !oST.Replace('$BUILDNUMBER$',CLIP(intBuildNumber))
+ oST.Replace('$BUILDNUMBER$',CLIP(strRev)) 
  oST.Replace('$PRODUCT$',CLIP(strProductName))
  
   CASE gConfig.VersionType
