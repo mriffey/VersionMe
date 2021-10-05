@@ -8,6 +8,8 @@ This build number ends up in your app so you can see it via the Windows Explorer
 
 **SETTING UP VersionMe** 
 
+1) Add the Pre-build event command
+
 In your Clarion project, add this line to the "Pre-build event command line":
 c:\projects\VersionMe\VersionMe.exe PROJECT=$(OutputName) BINARYTYPE=$(OutputType) APPFOLDER=$(SolutionDir) 
 
@@ -15,4 +17,52 @@ The path/filename for VersionMe.exe can be different - but it must resolve succe
 
 Example:
 
-![alt text](https://github.com/mriffey/VersionMe/blob/master/VersionMeProjectDetails.jpg?raw=true)
+![VersionME Clarion project properties](https://github.com/mriffey/VersionMe/blob/master/VersionMeProjectDetails.jpg?raw=true)
+
+
+2) Create the XML file
+
+Each app requires a NAME_VersionME.XML where NAME is the name of your .app or .cwproj. At various points in processing, this name is pulled from $(OutputName) (see the pre-event command line details above). 
+
+Once you fill in the XML, the build details (specifically BUILDNUMBwill be maintained automatically. You, of course, are responsible for things like PRODUCTNAME, COMPANYNAME, etc. 
+
+```
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<VersionMeConfig>
+    <VERSIONTYPE>SLN</VERSIONTYPE>
+    <PRODUCTNAME>My app</PRODUCTNAME>
+    <COMPANYNAME>MyCompany, Inc.</COMPANYNAME>
+    <COPYRIGHTSTARTYEAR>2007</COPYRIGHTSTARTYEAR>
+    <FILEVERSIONNUMBERMAJ>YYYY</FILEVERSIONNUMBERMAJ>
+    <FILEVERSIONNUMBERMIN>MM</FILEVERSIONNUMBERMIN>
+    <FILEVERSIONNUMBERSUB>DD</FILEVERSIONNUMBERSUB>
+    <FILEVERSIONNUMBERREV/>
+    <PRODUCTVERSIONNUMBERMAJ/>
+    <PRODUCTVERSIONNUMBERMIN/>
+    <PRODUCTVERSIONNUMBERSUB/>
+    <PRODUCTVERSIONNUMBERREV/>
+    <BUILDNUMBER>2733</BUILDNUMBER>
+    <VERSIONTEXT>My appname</VERSIONTEXT>
+    <VERSIONTEXTSHORT>ShortAppname</VERSIONTEXTSHORT>
+    <SBINIFILE>C:\Dropbox (Personal)\somefolder\MyAppVersion.ini</SBINIFILE> <!-- fully qualified path to the ini used by SB-->
+</VersionMeConfig>
+```
+
+
+3) Build
+
+when you build and versionme.exe runs, it will create an ini file that looks like this: 
+
+```
+[build]
+version=2021.9.24
+```
+
+The ini will be named as specified the XML above via the SBINIFILE value. 
+
+That ini will (can) be read by SetupBuilder like this:
+
+![VersionME SetupBuilder ini code](https://github.com/mriffey/VersionMe/blob/master/VersionMeSetupBuilderIniSetup.jpg?raw=true)
+
+Once you've read it into SB, you can use it as you wish. 
+
