@@ -85,5 +85,6 @@ That ini will (can) be read by SetupBuilder like this:
 Once you've read it into SB, you can use it as you wish. 
 
 
+Below, the resulting binary from the example: 
 ![The resulting binary](https://github.com/mriffey/VersionMe/blob/master/VersionMeVersioningWorked.jpg?raw=true)
 
