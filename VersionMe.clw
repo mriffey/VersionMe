@@ -1,8 +1,10 @@
 
   PROGRAM
 
-  INCLUDE('StringTheory.inc')   ! if your compile fails on this line, you need Capesoft's StringTheory. This is an unpaid endorsement:)
-  INCLUDE('xfiles.inc')         ! if your compile fails on this line, you need Capesoft's xFiles. This is an unpaid endorsement:)
+  INCLUDE('StringTheory.inc'),ONCE   ! if your compile fails on this line, you need Capesoft's StringTheory. This is an unpaid endorsement:)
+  INCLUDE('xfiles.inc'),ONCE        ! if your compile fails on this line, you need Capesoft's xFiles. This is an unpaid endorsement:)
+  
+  !,ONCE added to make MG happy:)
   
 fp_VMe_SHGetFolderPath             ULONG,STATIC,NAME('VMe_SHGetFolderPath')
   

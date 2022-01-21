@@ -7,6 +7,7 @@
     <RootNamespace>VersionMeExample</RootNamespace>
     <AssemblyName>VersionMeExample</AssemblyName>
     <OutputName>VersionMeExample</OutputName>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>True</DebugSymbols>
@@ -23,10 +24,17 @@
     <check_index>False</check_index>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="VersionMe.clw" />
     <Compile Include="VersionMeExample.clw" />
+    <None Include="VersionMeExample_VersionMe.ini" />
+    <None Include="VersionMeExample_VersionMe.xml" />
+    <None Include="VersionMeTemplate.clw" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="VersionMeExample.version" />
   </ItemGroup>
   <Import Project="$(ClarionBinPath)\SoftVelocity.Build.Clarion.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>C:\Projects\VersionMe\VersionMe.exe PROJECT=$(OutputName) BINARYTYPE=$(OutputType) APPFOLDER=$(SolutionDir)</PreBuildEvent>
+  </PropertyGroup>
 </Project>
