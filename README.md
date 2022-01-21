@@ -44,10 +44,28 @@ Once you fill in the XML, the build details (specifically BUILDNUMBwill be maint
     <BUILDNUMBER>2733</BUILDNUMBER>
     <VERSIONTEXT>My appname</VERSIONTEXT>
     <VERSIONTEXTSHORT>ShortAppname</VERSIONTEXTSHORT>
+    <APPLYCLWVERSIONTO>c:\projects\KSSOpen\source\VersionMe.clw</APPLYCLWVERSIONTO>
+    <APPLYCLWTEMPLATE>c:\projects\KSSOpen\source\VersionMeTemplate.clw</APPLYCLWTEMPLATE>
     <SBINIFILE>C:\Dropbox (Personal)\somefolder\MyAppVersion.ini</SBINIFILE> <!-- fully qualified path to the ini used by SB-->
 </VersionMeConfig>
 ```
 
+Note: The ApplyCLWVersionTo and ApplyCLWTemplate values need to be valid file specs in your source tree. 
+
+As an example, for KSS...
+
+c:\projects\KSSOpen\source\VersionMe.clw looks like this:
+```
+glo:szVersion        CSTRING('2022.1.21.24')
+```
+(doesnt really matter - this file is overlaid upon every compile)
+
+and 
+
+c:\projects\KSSOpen\source\VersionMeTemplate.clw looks like this:
+```
+glo:szVersion        CSTRING('$VERSIONME')
+```
 
 3) Build
 
