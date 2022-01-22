@@ -1,9 +1,0 @@
-/OPTIONS L
-iexe32.obj
-VersionMe.obj
-Claasc.lib
-StringTheory.obj
-xFiles.obj
-ClaRUN.lib
-WIN32.lib
-/SHARE_CONST
