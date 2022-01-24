@@ -3,3 +3,4 @@ map/debug/VersionMe.MAP
 obj/
 ClaRUN.dll
 ClaASC.dll
+*.cache
