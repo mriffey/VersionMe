@@ -69,7 +69,7 @@ glo:szVersion        CSTRING('$VERSIONME')
 
 3) Build
 
-when you build and versionme.exe runs, it will create an ini file that looks like this: 
+when you build and versionme.exe runs, it will create (or modify) an ini file that looks like this: 
 
 ```
 [build]
@@ -77,6 +77,8 @@ version=2021.9.24
 ```
 
 The ini will be named as specified the XML above via the SBINIFILE value. 
+
+Each time you build the app, the build # at the end of the version= value is incremented. Likewise, if the date changes, the date portion of the version= value is changed.
 
 That ini will (can) be read by SetupBuilder like this:
 
