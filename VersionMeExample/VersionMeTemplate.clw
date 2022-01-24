@@ -1,0 +1,1 @@
+szVersion        CSTRING('$VERSIONME')

@@ -1,0 +1,35 @@
+  401030       23 Code                IEXE32_TEXT
+  401054       1C Code                INIT_TEXT
+  401070       6F Code                VERSIONMEEXAMPLE_TEXT
+  402000       44 Initialized Data    IEXE32_DATA
+  402044        D Initialized Data    VERSIONMEEXAMPLE_DATA
+  402054        0 Initialized Data    __CPPINI_CONS
+  402054       1C Initialized Data    __CPPINI_CONST
+  402070        4 Initialized Data    __CPPINI_END
+  402074        0 Initialized Data    __INIVMT_CONS
+  402074        0 Initialized Data    __INIVMT_CONST_END
+  403000        8 __T_L_S__DAT
+  403008        0 __T_L_S__DATA_END
+  403010        0 __T_L_S__BS
+  403010        0 __T_L_S__BSS_END
+
+  401070 _main
+  402044 $SZVERSION
+  404000 __import_section_start
+  40413C __import_section_end
+
+Imports
+ClaRUN.dll:Cla$code 404054
+ClaRUN.dll:Cla$init 404058
+ClaRUN.dll:Cla$MessageBox 40405C,401000
+ClaRUN.dll:Cla$PushCString 404060
+ClaRUN.dll:Cla$PushString 404064
+ClaRUN.dll:_exit 404068,401008
+ClaRUN.dll:__a_chkstk 40406C,401010
+ClaRUN.dll:__e_stack 404070,401018
+ClaRUN.dll:__sysinit 404074,401020
+ClaRUN.dll:__sysstart 404078,401028
+
+
+
+Entry Point:   401030

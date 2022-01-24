@@ -1,8 +1,10 @@
 
   PROGRAM
 
-  INCLUDE('StringTheory.inc')   ! if your compile fails on this line, you need Capesoft's StringTheory. This is an unpaid endorsement:)
-  INCLUDE('xfiles.inc')         ! if your compile fails on this line, you need Capesoft's xFiles. This is an unpaid endorsement:)
+  INCLUDE('StringTheory.inc'),ONCE   ! if your compile fails on this line, you need Capesoft's StringTheory. This is an unpaid endorsement:)
+  INCLUDE('xfiles.inc'),ONCE        ! if your compile fails on this line, you need Capesoft's xFiles. This is an unpaid endorsement:)
+  
+  !,ONCE added to make MG happy:)
   
 fp_VMe_SHGetFolderPath             ULONG,STATIC,NAME('VMe_SHGetFolderPath')
   
@@ -48,6 +50,8 @@ BuildNumber                 LONG
 VersionText                 STRING(50) ! ie: Activation 2.2 Build 1234
 VersionTextShort            STRING(10) ! ie: Act2.2
 SBIniFile                   STRING(512)
+ApplyCLWVersionTo           STRING(512) ! for hand code apps, inserts version # into CLW so its "burned in" to compiled app for screen/report use. 
+ApplyCLWTemplate            STRING(512) ! template for versionto file
                     END
                     
 
@@ -81,6 +85,9 @@ strProductName          STRING(50)
 
 oXML                    XFileXML 
 oST                     StringTheory
+oSTCLW                  StringTheory 
+
+intRC LONG 
 
   CODE
   
@@ -95,9 +102,23 @@ oST                     StringTheory
         DO SetVersionBySolution
   END 
 
+!  oSTCLW.Trace('gConfig.ApplyCLWVersionTo=' & CLIP(gConfig.ApplyCLWVersionTo))
+!  oSTCLW.Trace('gConfig.ApplyCLWTemplate=' & CLIP(gConfig.ApplyCLWTemplate))
+
+  IF CLIP(gConfig.ApplyCLWVersionTo) > ' ' AND CLIP(gConfig.ApplyCLWTemplate) > ' '       
+     oSTCLW.LoadFile(gConfig.ApplyClwTemplate)
+     oSTCLW.Replace('$VERSIONME',CLIP(strProductVersionDots))
+     oSTCLW.Trace('Dots=' & CLIP(strProductVersionDOTS) & ' Post replace value=' & CLIP(oSTCLW.GetValue()))
+     intRC = oSTCLW.SaveFile(gConfig.ApplyCLWVersionTo) ! include file now includes "burned in" version info. 
+     IF intRC = TRUE 
+     ELSE 
+        oSTCLW.Trace('File save failed for ' & CLIP(gConfig.ApplyCLWVersionTo))
+     END 
+  END 
+    
   DO BuildVersionFile      
   
-  ! Re-save updated config file. 
+ ! Re-save updated config file. 
 !  oXML.Trace('Before Save ================')
 !  oXML.Trace('gConfig.BuildNumber=' & gConfig.BuildNumber)
 !  oXML.Trace('gConfig.FileVersionNumberMaj=' & gConfig.FileVersionNumberMaj)
@@ -178,6 +199,8 @@ SetupAndGetParameters  ROUTINE
 !-------------------------------------
 SetVersionBySolution ROUTINE      
 !-------------------------------------
+
+ oST.Trace('SetVersionBySolution - starting')
 ! supports data.YYYY.MM.DD, YYYY.MM.DD.data, data.YY.MM.DD, YY.MM.DD.data and data.data.data.data.
 !-------------------------------------
          
@@ -256,6 +279,7 @@ SetVersionBySolution ROUTINE
              ! supports data.YY.MM.DD
              IF CLIP(gConfig.ProductVersionNumberMin) = 'YY' 
                 strProductVersion = CLIP(strProductVersion) & ',' & FORMAT(YEAR(TODAY()) - 2000,@N_2) & ',' & MONTH(TODAY()) & ',' & DAY(TODAY())           
+                strProductVersionDOTS = CLIP(strProductVersion) & '.' & FORMAT(YEAR(TODAY()) - 2000,@N_2) & '.' & MONTH(TODAY()) & '.' & DAY(TODAY())           
              ELSE 
                 ! supports data.data.data.data.
                 IF CLIP(gConfig.FileVersionNumberRev) > ' '       
@@ -265,11 +289,13 @@ SetVersionBySolution ROUTINE
                 END                 
 
                 strProductVersion = CLIP(strProductVersion) & ',' & CLIP(gConfig.ProductVersionNumberMin) & ',' & CLIP(gConfig.ProductVersionNumberSub) & ',' & CLIP(strRev)
+                strProductVersionDOTS = CLIP(strProductVersion) & '.' & CLIP(gConfig.ProductVersionNumberMin) & '.' & CLIP(gConfig.ProductVersionNumberSub) & '.' & CLIP(strRev)
              END 
           END 
     END 
  ELSE 
     strProductVersion = strFileVersion
+    strProductVersionDOTS = CLIP(strFileVersionDOTS)
  END 
 
  intBuildNumber       = gConfig.BuildNumber
@@ -277,6 +303,11 @@ SetVersionBySolution ROUTINE
  strVersionText       = gConfig.VersionText
  strVersionTextShort  = gConfig.VersionTextShort       
  strProductName       = gConfig.ProductName        
+  
+ oST.Trace('SLN: strFileVersion       =' & CLIP(strFileVersion)) 
+ oST.Trace('SLN: strProductVersion    =' & CLIP(strProductVersion))
+ oST.Trace('SLN: strProductVersionDots=' & CLIP(strProductVersionDOTS))
+ oST.Trace('SLN: strFileVersionDots   =' & CLIP(strFileVersionDOTS)) 
  
  EXIT 
 
@@ -284,6 +315,8 @@ SetVersionBySolution ROUTINE
 !-------------------------------------                
 SetVersionByProject ROUTINE 
 !-------------------------------------        
+
+ oST.Trace('SetVersionByProject - starting')
 
  CASE CLIP(gConfig.FileVersionNumberMaj)
     ! supports YYYY.MM.DD.data
@@ -395,12 +428,15 @@ SetVersionByProject ROUTINE
  intBuildNumber       = qConfig.BuildNumber
  strProductName       = CLIP(gConfig.ProductName) & ' - ' & CLIP(qConfig.ProjectName)        
  
+ oST.Trace('strProductVersionDots=' & CLIP(strProductVersionDOTS))
+ oST.Trace('strFileVersionDots   =' & CLIP(strFileVersionDOTS))
+ 
  EXIT   
   
 !-----------------------------------  
 BuildVersionFile ROUTINE 
 !-----------------------------------    
-
+ 
  oST.SetValue('LANGUAGE 0x0409<13,10>' |
             & '<13,10>' |
             & '1 VERSIONINFO<13,10>' |
