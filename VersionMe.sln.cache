@@ -1,6 +1,6 @@
 ﻿<Project DefaultTargets="Build" ToolsVersion="4.0" InitialTargets="ValidateSolutionConfiguration;ValidateToolsVersions" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <_SolutionProjectConfiguration>Debug|Win32</_SolutionProjectConfiguration>
+    <_SolutionProjectConfiguration>Release|Win32</_SolutionProjectConfiguration>
     <_SolutionProjectToolsVersion>4.0</_SolutionProjectToolsVersion>
     <_SolutionProjectCacheVersion>4.0</_SolutionProjectCacheVersion>
   </PropertyGroup>
@@ -31,11 +31,11 @@
     <AspNetConfiguration>$(Configuration)</AspNetConfiguration>
   </PropertyGroup>
   <PropertyGroup>
-    <SolutionDir>C:\projects\VersionMe\</SolutionDir>
+    <SolutionDir>C:\_GIT_\MarkRiffey\VersionMe\</SolutionDir>
     <SolutionExt>.sln</SolutionExt>
     <SolutionFileName>VersionMe.sln</SolutionFileName>
     <SolutionName>VersionMe</SolutionName>
-    <SolutionPath>C:\projects\VersionMe\VersionMe.sln</SolutionPath>
+    <SolutionPath>C:\_GIT_\MarkRiffey\VersionMe\VersionMe.sln</SolutionPath>
   </PropertyGroup>
   <PropertyGroup>
     <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == '' and '$(MSBuildToolsVersion)' == '2.0'">v2.0</TargetFrameworkVersion>
